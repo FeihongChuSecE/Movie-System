@@ -9,7 +9,7 @@ app.get("/movies", (req, res, next) => {
   res.send("Hello, welcome to your movie page");
 })
 
-//get a book by id, name, actors/actress
+//get a movie by id, name, cast
 app.get("/movies/:id", (req, res, next) => {
   res.send("Hello, welcome to your movie page");
 })
@@ -19,12 +19,12 @@ app.post("/movies", (req, res, next) => {
   res.send("Hey you watched a new movie");
 })
 
-//update data if the user want to change the view
+//update data if the user want to change the rating
 app.put("/movies/:id", (req, res, next) => {
   res.send("Hey you watched a new movie");
 })
 
-//deleate a movie
+//delete a movie
 app.delete("/movies/:id", (req, res, next) => {
   res.send("Hey you watched a new movie");
 })

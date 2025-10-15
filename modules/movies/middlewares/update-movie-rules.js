@@ -1,0 +1,25 @@
+import { body } from "express-validator";
+
+export const updateMovieRules = [
+  body("url").isExist().withMessage("Movie url is required"),
+  body("name").isExist(),
+  body("type").isExist(),
+  body("language").isExist(),
+  body("genres").isExist(),
+  body("status").isExist(),
+  body("runtime").isExist(),
+  body("averageRuntime").isExist(),
+  body("premiered").isExist(),
+  body("ended").isExist(),
+  body("officialSite").isExist(),
+  body("schedule").isExist(),
+  body("rating").isExist(),
+  body("weight").isExist(),
+  body("network").isExist(),
+  body("webChannel").isExist(),
+  body("dvdCountry").isExist(),
+  body("externals").isExist(),
+  body("image").isExist(),
+  body("summary").isExist(),
+  body("_links").isExist(),
+];

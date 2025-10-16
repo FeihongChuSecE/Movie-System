@@ -9,10 +9,11 @@ server.use(express.json());
 const router = express.Router();
 
 //add routes
+const { getAllMovies } = require(".movies/movie-model");
 router.route("/").get(getAllMovies);
 server.use("/modules/movies", router);
 
-//add error handling
+//add middleware error handling
 server.use((err, req, res, next) => {
   res.status(500).json({ err: "internal server error" });
 });

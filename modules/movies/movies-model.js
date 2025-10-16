@@ -1,16 +1,23 @@
-const { fetchFiles, readFile } = require("../../shared/file-utils");
+const {
+  fetchFiles,
+  readFile,
+  writeToFile,
+} = require("../../shared/file-utils");
 
 const filePath = "./data/movies.json";
+
 //get all movies from movies.json
 async function getAllMovies() {
   return readFile(filePath);
 }
 
-//get single product by id
+//get single movie by id
 async function getMovieByID(movieID) {
   if (!movieID)
     throw new Error(`Cannot use ${movieID} to get movie information`);
+
   const allMovies = await getAllMovies();
+  //convert id to number because JSON id is number
   const foundMovie = allMovies.find((movie) => movie.id === Number(movieID));
   return foundMovie;
 }
@@ -21,8 +28,11 @@ async function addNewMovie(newMovie) {
     throw new Error(`Cannot use ${newMovie} to add a new movie`);
   }
   const allMovies = await getAllMovies();
+  //create a new movie id
   newMovie = { id: allMovies.length + 1, ...newMovie };
+  //push the new id to the old one
   allMovies.push(newMovie);
+  //return the all the movie+new movie
   await writeToFile(filePath, allMovies);
   return newMovie;
 }
@@ -37,8 +47,10 @@ async function updateExistingMovie(movieID, newMovie) {
   //read all the movies
   const allMovies = await getAllMovies();
   //check the exist movie
-  const index = allMovies.findIndex((movie) => movie.id === movieID);
-  if (index < 0) throw new Error(`Movie with ${movieID} doesn't exist`);
+  const index = allMovies.findIndex((movie) => movie.id === Number(movieID));
+  if (index < 0) {
+    throw new Error(`Movie with ${movieID} doesn't exist`);
+  }
   //update
   const updatedMovie = { ...allMovies[index], ...newMovie };
   allMovies[index] = updatedMovie;
@@ -48,14 +60,19 @@ async function updateExistingMovie(movieID, newMovie) {
 
 //delete a movie by id
 async function deleteMovie(movieID) {
-  if (!movieID) throw new Error(`Cannot use ${movieID} to delete movie`);
+  if (!movieID) {
+    throw new Error(`Cannot use ${movieID} to delete movie`);
+  }
   //read
   const allMovies = await getAllMovies();
   //check
-  const index = allMovies.findIndex((movie) => movie.id === movieID);
-  if (index < 0) throw new Error(`Movie with ${movieID} doesn't exist`);
+  const index = allMovies.findIndex((movie) => movie.id === Number(movieID));
+  if (index < 0) {
+    throw new Error(`Movie with ${movieID} doesn't exist`);
+  }
   //delete
   const [deletedMovie] = allMovies.splice(index, 1);
+
   await writeToFile(filePath, allMovies);
   return deletedMovie;
 }

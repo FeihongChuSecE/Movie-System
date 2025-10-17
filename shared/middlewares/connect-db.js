@@ -1,3 +1,4 @@
+//MongoDB connection middleware
 const mongoose = require("mongoose");
 //store the dbUrl in .env
 const dbUrl = process.env.DB_URL;

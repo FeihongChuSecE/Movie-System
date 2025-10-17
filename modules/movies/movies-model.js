@@ -1,14 +1,17 @@
-const {
-  fetchFiles,
-  readFile,
-  writeToFile,
-} = require("../../shared/file-utils");
+const { readFile, writeToFile } = require("../../shared/file-utils");
+const path = require("path");
 
-const filePath = "./data/movies.json";
+const filePath = path.join(__dirname, "../../data/movies.json");
 
 //get all movies from movies.json
 async function getAllMovies() {
-  return readFile(filePath);
+  try {
+    const movies = await readFile(filePath);
+    return movies;
+  } catch (error) {
+    console.error("Error reading movies file: ", error.message);
+    return [];
+  }
 }
 
 //get single movie by id
@@ -52,7 +55,11 @@ async function updateExistingMovie(movieID, newMovie) {
     throw new Error(`Movie with ${movieID} doesn't exist`);
   }
   //update
-  const updatedMovie = { ...allMovies[index], ...newMovie };
+  const updatedMovie = {
+    ...allMovies[index],
+    ...newMovie,
+    id: allMovies[index].id,
+  };
   allMovies[index] = updatedMovie;
   await writeToFile(filePath, allMovies);
   return updatedMovie;
@@ -72,7 +79,6 @@ async function deleteMovie(movieID) {
   }
   //delete
   const [deletedMovie] = allMovies.splice(index, 1);
-
   await writeToFile(filePath, allMovies);
   return deletedMovie;
 }

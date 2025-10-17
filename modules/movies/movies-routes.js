@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 //get /movies information from movie-model
-const { getAllMovies } = require("./movies.model");
+
 const {
   getAllMovies,
   getMovieByID,
@@ -14,10 +14,10 @@ const { createMovieRules } = require("./middlewares/create-movie-rules");
 const { updateMovieRules } = require("./middlewares/update-movie-rules");
 
 //add middleware
-const { validationResult } = require("express-validator");
+const checkValidation = require("../../shared/middlewares/check-validation");
 
-//get all movies
-router.get("/movies", async (req, res, next) => {
+//get /movies get all movies
+router.get("/", async (req, res, next) => {
   try {
     //all products data
     const movies = await getAllMovies();
@@ -32,8 +32,8 @@ router.get("/movies", async (req, res, next) => {
   }
 });
 
-//get /mpvies/:id get a sigle movie by id
-router.get("/movies/:id", async (req, res, next) => {
+//get /movies/:id get a sigle movie by id
+router.get("/:id", async (req, res, next) => {
   try {
     //get all the id
     const movieID = req.params.id;
@@ -50,14 +50,8 @@ router.get("/movies/:id", async (req, res, next) => {
 });
 
 //post /movies add a new movie
-router.post("/movies", createMovieRules, async (req, res, next) => {
+router.post("/", createMovieRules, checkValidation, async (req, res, next) => {
   try {
-    const result = validationResult(req);
-
-    if (!result.isEmpty()) {
-      return res.status(400).send({ error: result.array() });
-    }
-
     const newMovie = await addNewMovie(req.body);
     res.json(newMovie); //return new movie
   } catch (error) {
@@ -66,31 +60,32 @@ router.post("/movies", createMovieRules, async (req, res, next) => {
 });
 
 //put /movies/:id update existing movie
-router.put("/movies/:id", updateMovieRules, async (req, res, next) => {
-  try {
-    const result = validationResult(req);
-    if (!result.isEmpty()) {
-      return res.status(400).send({ error: result.array() });
-    }
-    //fatch data by id
-    const movieID = req.params.id;
-    const movie = await getMovieByID(movieID);
-    if (!movie) {
-      return res.status(404).json({ message: "movie not found" });
-    }
+router.put(
+  "/:id",
+  updateMovieRules,
+  checkValidation,
+  async (req, res, next) => {
+    try {
+      //fatch data by id
+      const movieID = req.params.id;
+      const movie = await getMovieByID(movieID);
+      if (!movie) {
+        return res.status(404).json({ message: "movie not found" });
+      }
 
-    const updatedMovie = await updateExistingMovie(movieID, req.body);
+      const updatedMovie = await updateExistingMovie(movieID, req.body);
 
-    if (movie.isExist()) {
-      return res.json(updatedMovie); //return updated movie
+      if (movie.isExist()) {
+        return res.json(updatedMovie); //return updated movie
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Internal Server Error" });
     }
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
   }
-});
+);
 
 //delete /movies/:id delete a movie by id
-router.delete("/movies/:id", async (req, res, next) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     const movieID = req.params.id;
     const movie = await getMovieByID(movieID);

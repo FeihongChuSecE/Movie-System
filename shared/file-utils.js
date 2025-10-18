@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-async function fetchFiles() {
+async function fetchMovies() {
   try {
     //fetch data from API
     const url = "https://api.tvmaze.com/shows";
@@ -19,10 +19,29 @@ async function fetchFiles() {
   }
 }
 
-//read json file and parse
-async function readFile(movieData) {
+async function fetchUsers() {
   try {
-    const file = fs.readFileSync(movieData, "utf-8");
+    //fetch data from API
+    const url = "https://dummyjson.com/users";
+    const response = await fetch(url); //fetch the data
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const userData = await response.json(); //json object
+
+    //save the data to users.json
+    const userJson = JSON.stringify(userData.users, null, 2); //json string
+    fs.writeFileSync("./data/users.json", userJson, "utf-8");
+    console.log("Data saved to users.json");
+  } catch (error) {
+    console.error(`Couldn't save data ${error.message}`);
+  }
+}
+
+//read json file and parse
+async function readFile(filePath) {
+  try {
+    const file = fs.readFileSync(filePath, "utf-8");
     return JSON.parse(file);
   } catch (error) {
     throw new Error(`Couldn't read file ${error.message}`);
@@ -30,13 +49,13 @@ async function readFile(movieData) {
 }
 
 //write file to movie.json
-async function writeToFile(movieData, update) {
+async function writeToFile(filePath, update) {
   try {
     const data = JSON.stringify(update, null, 2);
-    fs.writeFileSync(movieData, data, "utf-8");
+    fs.writeFileSync(filePath, data, "utf-8");
   } catch (error) {
-    throw new Error(`Couldn't write into file ${movieJson}`);
+    throw new Error(`Couldn't write into file ${filePath}: ${error.message}`);
   }
 }
 
-module.exports = { fetchFiles, readFile, writeToFile };
+module.exports = { fetchMovies, fetchUsers, readFile, writeToFile };

@@ -19,7 +19,7 @@ const checkValidation = require("../../shared/middlewares/check-validation");
 //get /movies get all movies
 router.get("/", async (req, res, next) => {
   try {
-    //all products data
+    //all movies data
     const movies = await getAllMovies();
     //no movie exist
     if (!movies || movies.length === 0) {

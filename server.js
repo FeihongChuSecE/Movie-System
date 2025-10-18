@@ -7,8 +7,22 @@ const hostname = "localhost";
 //add build-in middlewares
 server.use(express.json());
 //add router
-const router = require("./modules/movies/movies-routes");
-server.use("/movies", router);
+const moviesRouter = require("./modules/movies/movies-routes");
+const usersRouter = require("./modules/users/users-routes");
+server.use("/movies", moviesRouter);
+server.use("/users", usersRouter);
+
+//temporary route to fetch users
+const { fetchMovies, fetchUsers } = require("./shared/file-utils");
+
+server.get("/fetch-users", async (req, res) => {
+  try {
+    await fetchUsers();
+    res.json({ message: "Users data fetched successfully!" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 //add middleware error handling: must come after routes
 server.use((err, req, res, next) => {

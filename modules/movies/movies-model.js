@@ -83,10 +83,34 @@ async function deleteMovie(movieID) {
   return deletedMovie;
 }
 
+//create mongoose
+const mongoose = require("mongoose");
+const movieSchema = new mongoose.Schema({
+  id: { type: Number, required: true, unique: true },
+  url: { type: String },
+  name: { type: String, required: true },
+  type: { type: String },
+  language: { type: String },
+  genres: [String],
+  status: { type: String },
+  runtime: { type: Number },
+  premiered: { type: String },
+  officialSite: { type: String },
+  rating: {
+    average: { type: Number },
+  },
+  weight: { type: Number },
+  webChannel: { type: String, default: null },
+  summary: { type: String },
+});
+
+const MovieModel = new mongoose.model("Movie", movieSchema, "movies");
+
 module.exports = {
   getAllMovies,
   getMovieByID,
   addNewMovie,
   updateExistingMovie,
   deleteMovie,
+  MovieModel,
 };

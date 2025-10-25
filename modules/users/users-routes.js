@@ -20,4 +20,14 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
+//post /users add a new user
+router.post("/", createUserRules, checkValidation, async (req, res, next) => {
+  try {
+    const newUser = await addNewUser(req.body);
+    res.json(newUser); //return new user
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 module.exports = router;

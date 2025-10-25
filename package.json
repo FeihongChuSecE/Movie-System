@@ -1,7 +1,7 @@
 {
   "name": "project",
   "version": "1.0.0",
-  "description": "",
+  "description": "Brief overview: Users can manage all the movies(name, introduce, rate, views) they watched, add new movies, delete movies, or update movies. This is a system to record your personal interest movie. Maybe it can suggest movies you would like.  \r # phase\r As a single user, movie system could login \"/users/id\" with name/ email/ phone/ username etc. BUT user connot delete the user information.\r Movies have home page \"/movies\",  fetch all the movies; \r detail page \"/movies/id\", fetch a single movie by id;\r user page \"/movies/id\", fetch the users interested movies.",
   "license": "ISC",
   "author": "",
   "type": "commonjs",
@@ -12,8 +12,22 @@
   },
   "keywords": [],
   "dependencies": {
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-validator": "^7.2.1",
+    "mongodb": "^6.20.0",
+    "mongoose": "^8.19.2",
     "node-fetch": "^3.3.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FeihongChuSecE/Movie-System.git"
+  },
+  "bugs": {
+    "url": "https://github.com/FeihongChuSecE/Movie-System/issues"
+  },
+  "homepage": "https://github.com/FeihongChuSecE/Movie-System#readme",
+  "devDependencies": {
+    "@types/mongoose": "^5.11.96"
   }
 }

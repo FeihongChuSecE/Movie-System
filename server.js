@@ -1,14 +1,20 @@
+const connectDB = require("./shared/middlewares/connect-db");
+//import dotenv and connectDB at top
+require("dotenv").config();
+
 const express = require("express");
 const server = express();
 
-const PORT = 4000;
+const PORT = 3000;
 const hostname = "localhost";
 
-//add build-in middlewares
+//add build-in middlewares to parse request body in application-level
 server.use(express.json());
+server.use(connectDB);
 //add router
 const moviesRouter = require("./modules/movies/movies-routes");
 const usersRouter = require("./modules/users/users-routes");
+
 server.use("/movies", moviesRouter);
 server.use("/users", usersRouter);
 

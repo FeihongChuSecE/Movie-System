@@ -24,4 +24,18 @@ async function getUserByID(userID) {
   return foundUser;
 }
 
-module.exports = { getAllUsers, getUserByID };
+//add a new user by id
+async function addNewUser(newUser) {
+  if (!newUser) {
+    throw new Error(`Cannot use ${newUser} to add a new user`);
+  }
+  const allUsers = await getAllUsers();
+  //create a new user id
+  newUser = { id: allUsers.length + 1, ...newUser };
+  //push the new id to the old one
+  allUsers.push(newUser);
+  //return the all the user+new user
+  await writeToFile(filePath, allUsers);
+  return newUser;
+}
+module.exports = { getAllUsers, getUserByID, addNewUser };

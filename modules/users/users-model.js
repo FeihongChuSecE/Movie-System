@@ -40,15 +40,53 @@ async function addNewUser(newUser) {
 }
 
 const mongoose = require("mongoose");
+const { Network } = require("inspector/promises");
 const userSchema = new mongoose.Schema({
+  id: {
+    typr: Number,
+    required: true,
+    unique: true,
+  },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
+  maidenName: { typr: String },
+  age: { type: Number },
+  gender: { type: String },
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   phone: { type: String, required: true },
-  username: { type: String, required: true, unique: true },
+  username: { type: String, required: true },
   password: { type: String, required: true, minlength: 6 },
+  birthDate: { type: String },
+  image: { type: String },
+  bloodGroup: { type: String },
+  height: { type: Number },
+  weight: { type: Number },
+  eyeColor: { type: String },
+  hair: {
+    color: { type: String },
+    type: { type: String },
+  },
+  ip: { type: String },
+  address: { type: objectId, ref: "Address" },
+  macAddress: { type: String },
+  university: { type: String },
+  bank: { type: objectId, ref: "Bank" },
+  company: { type: objectId, ref: "Company" },
+  ein: { type: String },
+  ssn: { type: String },
+  userAgent: { type: String },
+  crypto: {
+    coin: { type: String },
+    wallet: { type: String },
+    network: { type: String },
+  },
+  role: { type: String },
 });
 
 const UserModel = new mongoose.model("User", userSchema, "users");
 
-module.exports = { getAllUsers, getUserByID, addNewUser };
+module.exports = { getAllUsers, getUserByID, addNewUser, UserModel };

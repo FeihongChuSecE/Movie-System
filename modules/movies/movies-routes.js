@@ -18,23 +18,6 @@ const { updateMovieRules } = require("./middlewares/update-movie-rules");
 const checkValidation = require("../../shared/middlewares/check-validation");
 const { check } = require("express-validator");
 
-/*
-//get /movies get all movies
-router.get("/", async (req, res, next) => {
-  try {
-    //all movies data
-    const movies = await getAllMovies();
-    //no movie exist
-    if (!movies || movies.length === 0) {
-      return res.json([]);
-    }
-
-    res.json(movies); //return all movies
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-*/
 //./movies?name=....check the movie exists, not exist, create a new movie
 router.get("/", async (req, res, next) => {
   try {
@@ -86,24 +69,7 @@ router.get("/", async (req, res, next) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-/*
-//get /movies/:id get a sigle movie by id
-router.get("/:id", async (req, res, next) => {
-  try {
-    //get all the id
-    const movieID = req.params.id;
-    const movie = await getMovieByID(movieID);
-    //error
-    if (!movie) {
-      return res.status(404).json({ message: "movie not found" });
-    }
-    //success return the sigle movie
-    res.json(movie);
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-*/
+
 //get /:id?search={name}&page=2&limit=10 get movies by id
 router.get("/:id", async (req, res, next) => {
   try {
@@ -142,16 +108,7 @@ router.get("/:id", async (req, res, next) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
-/*
-//post /movies add a new movie
-router.post("/", createMovieRules, checkValidation, async (req, res, next) => {
-  try {
-    const newMovie = await addNewMovie(req.body);
-    res.json(newMovie); //return new movie
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});*/
+
 //post /movies add a new movie
 router.post("/", createMovieRules, checkValidation, async (req, res, next) => {
   try {
@@ -162,32 +119,6 @@ router.post("/", createMovieRules, checkValidation, async (req, res, next) => {
   }
 });
 
-/*
-//put /movies/:id update existing movie
-router.put(
-  "/:id",
-  updateMovieRules,
-  checkValidation,
-  async (req, res, next) => {
-    try {
-      //fatch data by id
-      const movieID = req.params.id;
-      const movie = await getMovieByID(movieID);
-      if (!movie) {
-        return res.status(404).json({ message: "movie not found" });
-      }
-
-      const updatedMovie = await updateExistingMovie(movieID, req.body);
-
-      if (movie.isExist()) {
-        return res.json(updatedMovie); //return updated movie
-      }
-    } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-  }
-);
-*/
 // put movies/:id update a signal movie that match a filter
 router.put(
   "/:id",
@@ -213,26 +144,7 @@ router.put(
     }
   }
 );
-/*
-//delete /movies/:id delete a movie by id
-router.delete("/:id", async (req, res, next) => {
-  try {
-    const movieID = req.params.id;
-    const movie = await getMovieByID(movieID);
-    if (!movie) {
-      return res.status(404).json({ message: "movie not found" });
-    }
-    //movie not delete
-    const deletedMovie = await deleteMovie(movieID);
-    if (movie.isExist()) {
-      return res.status(404).json({ message: "movie is not deleted" });
-    }
 
-    res.json(deletedMovie); //return deleted movie
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});*/
 //delete /movies/:id delete a movie by id
 router.delete("/:id", async (req, res, next) => {
   try {

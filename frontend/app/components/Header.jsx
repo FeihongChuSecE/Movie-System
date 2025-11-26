@@ -1,9 +1,14 @@
-const Header = (props) => {
+const Header = () => {
   return (
     <header>
-      <h2>Movie System</h2>
-      {/**add movie */}
-      <Button></Button>
+      <h1>Movie System</h1>
+      <nav>
+        <button>add movie</button>
+        <button>delete movie</button>
+      </nav>
+      {/**movie list */}
+      <list>Movie list</list>
     </header>
   );
 };
+export default Header;

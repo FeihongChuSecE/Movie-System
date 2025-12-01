@@ -85,12 +85,9 @@ async function deleteMovie(movieID) {
 
 //create mongoose
 const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Schema.Types;
 const movieSchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    required: true,
-    unique: true,
-  },
+  id: { type: Number, required: true, unique: true },
   url: { type: String },
   name: { type: String, required: true },
   type: { type: String },
@@ -102,35 +99,25 @@ const movieSchema = new mongoose.Schema({
   premiered: { type: String },
   ended: { type: String },
   officialSite: { type: String },
-  schedule: {
-    time: { type: String },
-    days: [{ type: String }],
-  },
-  rating: {
-    average: { type: Number },
-  },
+  schedule: { time: { type: String }, days: [{ type: String }] },
+  rating: { average: { type: Number } },
   weight: { type: Number },
+
   webChannel: { type: String, default: null },
   summary: { type: String },
   network: { type: ObjectId, ref: "Network" },
-  webChannel: { default: null },
-  dvdCountry: { default: null },
+
   externals: {
     tvrage: { type: Number },
     thetvdb: { type: Number },
     imdb: { type: String },
   },
   image: { type: ObjectId, ref: "Image" },
-  summary: { type: String },
+
   updated: { type: Number },
   _links: {
-    self: {
-      href: { type: String },
-    },
-    previousepisode: {
-      href: { type: String },
-      name: { type: String },
-    },
+    self: { href: { type: String } },
+    previousepisode: { href: { type: String }, name: { type: String } },
   },
 });
 

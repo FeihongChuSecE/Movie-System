@@ -9,7 +9,11 @@ console.log(dbUrl);
 // middleware to connect to mongoDB
 async function connectDB(req, res, next) {
   try {
-    await mongoose.connect(dbUrl, { dbName: "movieSystemDB" });
+    await mongoose.connect(dbUrl, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      dbName: "movieSystemDB",
+    });
     console.log("Database connected!");
     next();
   } catch (error) {

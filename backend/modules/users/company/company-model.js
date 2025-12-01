@@ -6,6 +6,6 @@ const companySchema = new mongoose.Schema({
   title: { type: String },
   address: { type: ObjectId, ref: "Address" },
 });
-const Company = new mongoose.module("Company", companySchema);
+const Company = mongoose.module("Company", companySchema);
 
 module.exports = Company;

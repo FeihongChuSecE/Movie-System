@@ -40,16 +40,16 @@ async function addNewUser(newUser) {
 }
 
 const mongoose = require("mongoose");
-const { Network } = require("inspector/promises");
+const { ObjectId } = mongoose.Schema.Types;
 const userSchema = new mongoose.Schema({
   id: {
-    typr: Number,
+    type: Number,
     required: true,
     unique: true,
   },
   firstName: { type: String, required: true },
   lastName: { type: String, required: true },
-  maidenName: { typr: String },
+  maidenName: { type: String },
   age: { type: Number },
   gender: { type: String },
   email: {
@@ -71,11 +71,11 @@ const userSchema = new mongoose.Schema({
     type: { type: String },
   },
   ip: { type: String },
-  address: { type: objectId, ref: "Address" },
+  address: { type: ObjectId, ref: "Address" },
   macAddress: { type: String },
   university: { type: String },
-  bank: { type: objectId, ref: "Bank" },
-  company: { type: objectId, ref: "Company" },
+  bank: { type: ObjectId, ref: "Bank" },
+  company: { type: ObjectId, ref: "Company" },
   ein: { type: String },
   ssn: { type: String },
   userAgent: { type: String },

@@ -8,6 +8,6 @@ const bankSchema = new mongoose.Schema({
   iban: { type: String },
 });
 
-const Bank = new mongoose.module("Bnak", bankSchema);
+const Bank = mongoose.module("Bnak", bankSchema);
 
 module.exports = Bank;

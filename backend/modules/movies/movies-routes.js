@@ -42,29 +42,9 @@ router.get("/", async (req, res, next) => {
       }
       //movie not exist
     } else {
-      const movies = await MovieModel.find({});
+      const movies = await getAllMovies();
       return res.status(200).json(movies);
     }
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-// get / get movie details by name
-router.get("/", async (req, res, next) => {
-  try {
-    const name = req.query.name;
-    const movies = await MovieModel.find({
-      name: { $regex: `^${name}`, $options: "i" },
-    });
-
-    if (!movies || movies.length === 0) {
-      return res.json([]);
-    }
-    movies = await MovieModel.find({});
-    if (!movies || movies.length === 0) {
-      return res.json([]);
-    }
-    res.json(movies);
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }
@@ -128,7 +108,7 @@ router.put(
     try {
       //check movie exists
       const movieID = req.params.id;
-      const movie = await MovieModel.findOne(movieID);
+      const movie = await MovieModel.findById(movieID);
       if (!movie) {
         return res.status(404).json({ message: "movie not found" });
       }

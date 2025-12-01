@@ -13,6 +13,6 @@ const addressSchema = new mongoose.Schema({
   country: { type: String },
 });
 
-const Address = new mongoose.module("Address", addressSchema);
+const Address = mongoose.module("Address", addressSchema);
 
 module.exports = Address;

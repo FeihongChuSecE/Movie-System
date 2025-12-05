@@ -1,17 +1,17 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import "./page.css";
+import "./movie-system.css";
 
 export default function Home() {
   const router = useRouter();
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch movies from backend
+  // Fetch movies from backend - Updated to port 5000
   const fetchMovies = async () => {
     try {
-      const res = await fetch("http://localhost:3000/movies");
+      const res = await fetch("http://localhost:5000/movies");
       if (!res.ok) {
         throw new Error(`HTTP error! status: ${res.status}`);
       }
@@ -19,7 +19,8 @@ export default function Home() {
       setMovies(data);
     } catch (error) {
       console.error("Error fetching movies:", error);
-      alert("Failed to fetch movies");
+      // Silent fail on initial load - backend might not be ready
+      console.log("Backend movies will load when available");
     } finally {
       setLoading(false);
     }
@@ -33,12 +34,12 @@ export default function Home() {
     router.push("/add-movie");
   };
 
-  // Delete a movie
+  // Delete a movie - Updated to port 5000
   const deleteMovie = async (id) => {
     if (!confirm("Are you sure you want to delete this movie?")) return;
 
     try {
-      await fetch(`http://localhost:3000/movies/${id}`, {
+      await fetch(`http://localhost:5000/movies/${id}`, {
         method: "DELETE",
       });
       setMovies((prev) => prev.filter((m) => m.id !== id));
@@ -78,13 +79,36 @@ export default function Home() {
                   {/* Movie Image */}
                   <div className="movie-image-container">
                     <img
-                      src={movie.image?.medium}
-                      alt={movie.name}
+                      src={
+                        // Primary: Check if image is object with medium
+                        movie.image &&
+                        typeof movie.image === "object" &&
+                        movie.image.medium
+                          ? movie.image.medium
+                          : // Secondary: Check if image is string
+                            (typeof movie.image === "string"
+                              ? movie.image
+                              : null) ||
+                            // Fallback: Placeholder
+                            "https://via.placeholder.com/300x200?text=No+Image"
+                      }
+                      alt={movie.name || "Movie poster"}
                       className="movie-image"
                       style={{
                         width: "100%",
                         height: "200px",
                         objectFit: "cover",
+                        backgroundColor: "#f3f4f6", // Gray background for placeholders
+                      }}
+                      onError={(e) => {
+                        // Multiple fallback attempts
+                        e.target.src =
+                          "https://via.placeholder.com/300x200?text=No+Image";
+                        e.target.style.backgroundColor = "#f3f4f6";
+                      }}
+                      onLoad={(e) => {
+                        // Success - ensure proper styling
+                        e.target.style.backgroundColor = "transparent";
                       }}
                     />
                     <div>{movie.name}</div>

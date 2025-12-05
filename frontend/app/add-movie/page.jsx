@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import "./page.css";
+import "./add-page.css";
 
 export default function AddMovie() {
   const router = useRouter();
@@ -33,32 +33,77 @@ export default function AddMovie() {
     setLoading(true);
 
     try {
-      // Prepare the data for submission
+      // Prepare data to match MongoDB schema and validation rules
       const movieData = {
-        ...formData,
-        genres: formData.genres
-          ? formData.genres.split(",").map((g) => g.trim())
-          : [],
-        runtime: formData.runtime ? parseInt(formData.runtime) : null,
-        id: Date.now(), // Generate a unique ID
+        name: formData.name.trim(),  // Required field
+        type: formData.type || undefined,
+        language: formData.language.trim() || undefined,
+        status: formData.status || undefined,
+        officialSite: formData.officialSite || undefined,
+        summary: formData.summary.trim() || undefined,
       };
 
-      const res = await fetch("http://localhost:3000/movies", {
+      // Handle genres as array
+      if (formData.genres && formData.genres.trim()) {
+        movieData.genres = formData.genres.split(',').map(g => g.trim()).filter(g => g);
+      }
+
+      // Handle runtime as integer
+      if (formData.runtime && !isNaN(formData.runtime)) {
+        movieData.runtime = parseInt(formData.runtime);
+      }
+
+      // Handle dates - convert to full ISO format for validation
+      if (formData.premiered) {
+        const premieredDate = new Date(formData.premiered);
+        if (!isNaN(premieredDate.getTime())) {
+          movieData.premiered = premieredDate.toISOString();
+        }
+      }
+
+      if (formData.ended) {
+        const endedDate = new Date(formData.ended);
+        if (!isNaN(endedDate.getTime())) {
+          movieData.ended = endedDate.toISOString();
+        }
+      }
+
+      // Handle image as simple object (not ObjectId)
+      if (formData.image && formData.image.trim()) {
+        movieData.image = { medium: formData.image.trim() };
+      }
+
+      // Remove undefined or empty fields
+      Object.keys(movieData).forEach(key => {
+        if (movieData[key] === undefined || movieData[key] === '' || movieData[key] === null) {
+          delete movieData[key];
+        }
+      });
+
+      console.log('Sending movie data:', movieData);
+
+      const res = await fetch("http://localhost:5000/movies", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(movieData),
       });
 
+      const responseData = await res.json();
+      console.log('Backend response:', responseData);
+
       if (!res.ok) {
-        throw new Error(`HTTP error! status: ${res.status}`);
+        if (res.status === 400 && responseData.error) {
+          const errorMessages = responseData.error.map(err => `${err.msg} (${err.param})`).join(', ');
+          throw new Error(errorMessages);
+        }
+        throw new Error(responseData.message || `HTTP error! status: ${res.status}`);
       }
 
-      const newMovie = await res.json();
       alert("Movie added successfully!");
-      router.push("/"); // Redirect back to main page
+      router.push("/");
     } catch (error) {
       console.error("Error adding movie:", error);
-      alert("Error adding movie. Please try again.");
+      alert(`Error adding movie: ${error.message}`);
     } finally {
       setLoading(false);
     }

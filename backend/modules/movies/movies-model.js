@@ -112,7 +112,11 @@ const movieSchema = new mongoose.Schema({
     thetvdb: { type: Number },
     imdb: { type: String },
   },
-  image: { type: ObjectId, ref: "Image" },
+  // Store simple image object instead of ObjectId reference
+  image: {
+    type: Object,
+    default: { medium: "https://via.placeholder.com/300x200?text=No+Image" },
+  },
 
   updated: { type: Number },
   _links: {

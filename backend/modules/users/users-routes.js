@@ -13,7 +13,7 @@ const checkValidation = require("../../shared/middlewares/check-validation");
 const registerRules = require("./middlewares/register-rules");
 const loginRules = require("./middlewares/login-rules");
 const authorize = require("../../shared/middlewares/authorize");
-const { matchPassword } = require("../../shared/password-utils");
+const { matchPassword, encodePassword } = require("../../shared/password-utils");
 const { encodeToken } = require("../../shared/jwt-utils");
 
 //get /users/:id get a sigle user by id

@@ -1,25 +1,30 @@
 //MongoDB connection middleware
 const mongoose = require("mongoose");
 require("dotenv").config();
-//store the dbUrl in .env
-const dbUrl = process.env.DB_URL;
-const DB_NAME = process.env.DB_NAME;
 
-console.log(dbUrl);
+const DEFAULT_URI = "mongodb://localhost:27017/movieSystemDB";
+const dbUrl = process.env.DB_URL || process.env.MONGODB_URI || DEFAULT_URI;
+const DB_NAME = process.env.DB_NAME || "movieSystemDB";
 
-// middleware to connect to mongoDB
+let isConnected = false;
+
 async function connectDB(req, res, next) {
   try {
+    if (isConnected) return next();
+
     await mongoose.connect(dbUrl, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      dbName: "movieSystemDB",
+      dbName: DB_NAME,
     });
-    console.log("Database connected!");
+
+    isConnected = true;
+    console.log(`Database connected to ${dbUrl}/${DB_NAME}`);
     next();
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Database connection failed!");
+    console.error("Database connection failed:", error.message);
+    // Allow request to continue; downstream may handle via fallback
+    next();
   }
 }
 

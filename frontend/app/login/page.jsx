@@ -1,43 +1,55 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import "./login-page.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); //for form submit
+    e.preventDefault();
 
-    // Validate that email is provided
-    if (!email) {
+    // Validate inputs
+    if (!email.trim()) {
       setError("Please provide an email");
+      return;
+    }
+
+    if (!password.trim()) {
+      setError("Please provide a password");
       return;
     }
 
     setLoading(true);
     setError("");
+
     try {
-      const res = await fetch("http://localhost:3000/login", {
+      const res = await fetch("http://localhost:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
+
       const data = await res.json();
+
       if (!res.ok) {
-        setError(data.errorMessage);
-        setLoading(false);
+        setError(data.errorMessage || data.message || "Login failed");
         return;
       }
-      //save token
-      localStorage.setItem("token", data.token);
-      setLoading(false);
-      //redirect after success
-      router.push("/dashboard");
+
+      // Save token
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+
+      router.push("/");
     } catch (error) {
-      setError(error.message);
+      console.error("Login error:", error);
+      setError("Network error. Check if backend is running on port 5000.");
     } finally {
       setLoading(false);
     }
@@ -52,18 +64,19 @@ export default function Login() {
   if (error) {
     return (
       <div>
-        <p>{error}</p>
+        <p className="error">{error}</p>
       </div>
     );
   }
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h1>Login</h1>
+    <div className="container">
+      <h1 style={{ textAlign: "center", marginBottom: "20px" }}>Login</h1>
       <form onSubmit={handleSubmit}>
         <div>
           <label>Email</label>
           <input
+            className="input"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -73,13 +86,14 @@ export default function Login() {
         <div>
           <label>Password</label>
           <input
+            className="input"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
         </div>
-        <button type="submit" disabled={loading}>
+        <button type="submit" className="button" disabled={loading}>
           {loading ? "Logging in..." : "Login"}
         </button>
       </form>

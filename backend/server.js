@@ -6,7 +6,7 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const server = express();
 
-const PORT = 3000;
+const PORT = 5000; // Changed from 3000 to 5000 for frontend API calls
 const hostname = "localhost";
 
 //add build-in middlewares to parse request body in application-level

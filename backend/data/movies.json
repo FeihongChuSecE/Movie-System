@@ -14303,5 +14303,23 @@
         "name": "Jon Stewart's Final Episode"
       }
     }
+  },
+  {
+    "id": 250,
+    "name": "Moana",
+    "language": "English",
+    "status": "Ended",
+    "officialSite": "https://movies.disney.com/moana",
+    "summary": "Three thousand years ago, the greatest sailors in the world voyaged across the vast Pacific, discovering the many islands of Oceania. But then, for a millennium, their voyages stopped, and no one knows why…\n\nWalt Disney Animation Studios’ Moana is about an adventurous teenager who, with help from demigod Maui (voiced by Dwayne Johnson) sails out on a daring mission to prove herself a master wayfinder and save her people.",
+    "genres": [
+      "Action-Adventure",
+      "Animation",
+      "Family",
+      "Fantasy",
+      "Musical"
+    ],
+    "runtime": 107,
+    "premiered": "2016-11-23T00:00:00.000Z",
+    "ended": "2025-12-05T00:00:00.000Z"
   }
 ]

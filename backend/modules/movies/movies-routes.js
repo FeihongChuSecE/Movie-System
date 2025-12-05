@@ -22,29 +22,92 @@ const { check } = require("express-validator");
 router.get("/", async (req, res, next) => {
   try {
     const name = req.query.name;
-    //check name in db
-    if (name) {
-      //search movie by name
-      let movie = await MovieModel.findOne({
-        name: { $regex: name, $options: "i" },
-      });
-      if (movie) {
-        //movie exist
-        return res
-          .status(200)
-          .json({ message: `The movie ${name} exists`, movie: movie });
-      } else {
-        //movie not exist, create a new movie
-        movie = await MovieModel.create({ name });
-        return res
-          .status(200)
-          .json({ message: `The movie ${name} is created` });
+    // Always try Mongo first
+    let movies = await MovieModel.find({});
+
+    // Seed Mongo from file if empty
+    if (movies.length === 0) {
+      const fileMovies = await getAllMovies();
+      if (fileMovies.length) {
+        const toInsert = fileMovies.map((m, idx) => {
+          const img =
+            m.image && typeof m.image === "object"
+              ? m.image.medium || m.image.original || m.image.url
+              : typeof m.image === "string"
+              ? m.image
+              : undefined;
+          return {
+            id: m.id || idx + 1,
+            name: m.name,
+            type: m.type,
+            language: m.language,
+            genres: m.genres || [],
+            status: m.status,
+            runtime: m.runtime,
+            premiered: m.premiered,
+            ended: m.ended,
+            officialSite: m.officialSite,
+            summary: m.summary,
+            image: { medium: img || "https://via.placeholder.com/300x200?text=No+Image" },
+          };
+        });
+        await MovieModel.insertMany(toInsert);
+        movies = await MovieModel.find({});
       }
-      //movie not exist
-    } else {
-      const movies = await getAllMovies();
-      return res.status(200).json(movies);
     }
+
+    // Search by name
+    if (name) {
+      let movie =
+        movies.find((m) =>
+          m.name.toLowerCase().includes(name.toLowerCase())
+        ) ||
+        (await MovieModel.findOne({ name: { $regex: name, $options: "i" } }));
+
+      if (movie) {
+        const obj = movie.toObject ? movie.toObject() : movie;
+        const img = obj.image;
+        return res.status(200).json({
+          message: `The movie ${name} exists`,
+          movie: {
+            ...obj,
+            image: {
+              medium:
+                (img && typeof img === "object" && (img.medium || img.original)) ||
+                (typeof img === "string" ? img : "https://via.placeholder.com/300x200?text=No+Image"),
+            },
+          },
+        });
+      }
+
+      // Create minimal movie in Mongo
+      const count = await MovieModel.countDocuments();
+      const newMovie = await MovieModel.create({
+        id: count + 1,
+        name,
+        type: "Scripted",
+        image: { medium: "https://via.placeholder.com/300x200?text=No+Image" },
+      });
+      return res
+        .status(200)
+        .json({ message: `The movie ${name} is created`, movie: newMovie });
+    }
+
+    // Normalize all movies
+    const normalized = movies.map((m) => {
+      const obj = m.toObject ? m.toObject() : m;
+      const img = obj.image;
+      return {
+        ...obj,
+        image: {
+          medium:
+            (img && typeof img === "object" && (img.medium || img.original)) ||
+            (typeof img === "string" ? img : "https://via.placeholder.com/300x200?text=No+Image"),
+        },
+      };
+    });
+
+    return res.status(200).json(normalized);
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }
@@ -92,10 +155,34 @@ router.get("/:id", async (req, res, next) => {
 //post /movies add a new movie
 router.post("/", createMovieRules, checkValidation, async (req, res, next) => {
   try {
-    const newMovie = await MovieModel.create(req.body);
-    res.status(201).json(newMovie); //return new movie
+    // Normalize image before saving
+    const movieData = {
+      ...req.body,
+      image: req.body.image
+        ? typeof req.body.image === "string"
+          ? { medium: req.body.image }
+          : req.body.image
+        : { medium: "https://via.placeholder.com/300x200?text=No+Image" },
+    };
+
+    // Generate sequential id using max of Mongo and file data
+    const mongoMax = await MovieModel.find({})
+      .sort({ id: -1 })
+      .limit(1)
+      .then((docs) => (docs[0]?.id ? Number(docs[0].id) : 0));
+    const fileMovies = await getAllMovies();
+    const fileMax = fileMovies.reduce((max, m) => Math.max(max, m.id || 0), 0);
+    const nextId = Math.max(mongoMax, fileMax) + 1;
+    movieData.id = nextId;
+
+    const newMovie = await MovieModel.create(movieData);
+    res.status(201).json(newMovie);
   } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
+    console.error("Create movie error:", error);
+    res.status(500).json({
+      message: "Internal Server Error",
+      error: error.message,
+    });
   }
 });
 
@@ -128,18 +215,12 @@ router.put(
 //delete /movies/:id delete a movie by id
 router.delete("/:id", async (req, res, next) => {
   try {
-    const movieID = req.params.id;
-    const movie = await MovieModel.findById(movieID);
-    if (!movie) {
+    const movieID = Number(req.params.id);
+    const deletedMovie = await MovieModel.findOneAndDelete({ id: movieID });
+    if (!deletedMovie) {
       return res.status(404).json({ message: "movie not found" });
     }
-    //movie not delete
-    const deletedMovie = await MovieModel.findByIdAndDelete(movieID);
-    if (!deletedMovie) {
-      return res.status(404).json({ message: "movie not deleted" });
-    }
-
-    res.json({ message: "Movie deleted successfully", deletedMovie }); //return deleted movie
+    res.json({ message: "Movie deleted successfully", deletedMovie });
   } catch (error) {
     res.status(500).json({ message: "Internal Server Error" });
   }

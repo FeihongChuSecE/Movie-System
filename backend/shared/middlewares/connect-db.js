@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 //store the dbUrl in .env
 const dbUrl = process.env.DB_URL;
+const DB_NAME = process.env.DB_NAME;
 
 console.log(dbUrl);
 

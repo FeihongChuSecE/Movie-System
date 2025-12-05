@@ -11,6 +11,6 @@ const networkSchema = new mongoose.Schema({
   officialSite: { type: String },
 });
 
-const Network = mongoose.module("Network", networkSchema);
+const Network = mongoose.model("Network", networkSchema);
 
 module.exports = Network;

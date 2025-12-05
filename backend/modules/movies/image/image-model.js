@@ -5,6 +5,6 @@ const imageSchema = new mongoose.Schema({
   original: { type: String },
 });
 
-const Image = mongoose.module("Image", imageSchema);
+const Image = mongoose.model("Image", imageSchema);
 
 module.exports = Image;

@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import "./page.css";
 
 export default function AddMovie() {
   const router = useRouter();

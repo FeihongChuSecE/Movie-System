@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import "./movie-styles.css";
+import "./page.css";
 
 export default function Home() {
   const router = useRouter();
@@ -34,14 +34,14 @@ export default function Home() {
   };
 
   // Delete a movie
-  const deleteMovie = async (_id) => {
+  const deleteMovie = async (id) => {
     if (!confirm("Are you sure you want to delete this movie?")) return;
 
     try {
-      await fetch(`http://localhost:3000/movies/${_id}`, {
+      await fetch(`http://localhost:3000/movies/${id}`, {
         method: "DELETE",
       });
-      setMovies((prev) => prev.filter((m) => m._id !== _id));
+      setMovies((prev) => prev.filter((m) => m.id !== id));
     } catch (error) {
       console.error("Error deleting movie:", error);
       alert("Error deleting movie");
@@ -60,6 +60,10 @@ export default function Home() {
         <div>
           <button onClick={addMovie}>Add New Movie</button>
         </div>
+        {/* Login Button */}
+        <div>
+          <button onClick={() => router.push("/login")}>Login</button>
+        </div>
 
         {/* Movies List */}
         <div>
@@ -70,7 +74,7 @@ export default function Home() {
           ) : (
             <div className="movies-grid">
               {movies.map((movie) => (
-                <div key={movie._id} className="movie-card">
+                <div key={movie.id} className="movie-card">
                   {/* Movie Image */}
                   <div className="movie-image-container">
                     <img
@@ -127,7 +131,7 @@ export default function Home() {
                     {/* Delete Button */}
                     <div className="movie-actions">
                       <button
-                        onClick={() => deleteMovie(movie._id)}
+                        onClick={() => deleteMovie(movie.id)}
                         className="delete-btn"
                       >
                         Delete Movie

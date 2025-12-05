@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { ObjectId } = mongoose.Schema.Types;
 
 const companySchema = new mongoose.Schema({
   department: { type: String },
@@ -6,6 +7,6 @@ const companySchema = new mongoose.Schema({
   title: { type: String },
   address: { type: ObjectId, ref: "Address" },
 });
-const Company = mongoose.module("Company", companySchema);
+const Company = mongoose.model("Company", companySchema);
 
 module.exports = Company;

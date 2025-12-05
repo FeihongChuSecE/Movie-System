@@ -3,6 +3,7 @@ const connectDB = require("./shared/middlewares/connect-db");
 require("dotenv").config();
 
 const express = require("express");
+const cookieParser = require("cookie-parser");
 const server = express();
 
 const PORT = 3000;
@@ -10,7 +11,8 @@ const hostname = "localhost";
 
 //add build-in middlewares to parse request body in application-level
 server.use(express.json());
-server.use(connectDB);
+server.use(cookieParser());
+server.use(connectDB); // Re-enable MongoDB connection
 
 server.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
@@ -28,10 +30,15 @@ server.use((req, res, next) => {
 
 //add router
 const moviesRouter = require("./modules/movies/movies-routes");
-const usersRouter = require("./modules/users/users-routes");
+const {
+  router: usersRouter,
+  usersRoute,
+} = require("./modules/users/users-routes");
 
 server.use("/movies", moviesRouter);
 server.use("/users", usersRouter);
+// Mount login routes at root level to avoid conflicts
+server.use("/", usersRoute);
 
 //temporary route to fetch users
 const { fetchMovies, fetchUsers } = require("./shared/file-utils");

@@ -82,9 +82,13 @@ export default function AddMovie() {
 
       console.log('Sending movie data:', movieData);
 
+      const token = localStorage.getItem("token");
       const res = await fetch("http://localhost:5000/movies", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": token,
+        },
         body: JSON.stringify(movieData),
       });
 

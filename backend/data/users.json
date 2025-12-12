@@ -2098,5 +2098,25 @@
       "network": "Ethereum (ERC20)"
     },
     "role": "user"
+  },
+  {
+    "firstName": "Isabella",
+    "lastName": "Andy",
+    "email": "isabella.andy@gmail.com",
+    "password": "$2b$10$Pwf/7QYGljaguEddDDpnJ.jAjlYNi7yZrcAUU3eTysL7fLngtK8Uu",
+    "phone": "123-456-7890",
+    "id": 1765497225702,
+    "role": "user",
+    "createdAt": "2025-12-11T23:53:45.702Z"
+  },
+  {
+    "firstName": "John",
+    "lastName": "Doe",
+    "email": "john.doe@example.com",
+    "password": "$2b$10$XPS.MRMpcL6BXN9kj1s1qeIbfnOKHiAr2SXkMdA6Nnh/4S81HNK/i",
+    "phone": "",
+    "id": 1765497589344,
+    "role": "user",
+    "createdAt": "2025-12-11T23:59:49.344Z"
   }
 ]

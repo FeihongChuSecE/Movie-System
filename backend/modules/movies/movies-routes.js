@@ -16,6 +16,7 @@ const { updateMovieRules } = require("./middlewares/update-movie-rules");
 
 //add middleware
 const checkValidation = require("../../shared/middlewares/check-validation");
+const authorize = require("../../shared/middlewares/authorize");
 const { check } = require("express-validator");
 
 //./movies?name=....check the movie exists, not exist, create a new movie
@@ -153,7 +154,7 @@ router.get("/:id", async (req, res, next) => {
 });
 
 //post /movies add a new movie
-router.post("/", createMovieRules, checkValidation, async (req, res, next) => {
+router.post("/", authorize, createMovieRules, checkValidation, async (req, res, next) => {
   try {
     // Normalize image before saving
     const movieData = {
@@ -189,6 +190,7 @@ router.post("/", createMovieRules, checkValidation, async (req, res, next) => {
 // put movies/:id update a signal movie that match a filter
 router.put(
   "/:id",
+  authorize,
   updateMovieRules,
   checkValidation,
   async (req, res, next) => {
@@ -213,7 +215,7 @@ router.put(
 );
 
 //delete /movies/:id delete a movie by id
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id", authorize, async (req, res, next) => {
   try {
     const movieID = Number(req.params.id);
     const deletedMovie = await MovieModel.findOneAndDelete({ id: movieID });

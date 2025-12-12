@@ -7,6 +7,9 @@ export default function Home() {
   const router = useRouter();
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredMovies, setFilteredMovies] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Fetch movies from backend - Updated to port 5000
   const fetchMovies = async () => {
@@ -27,25 +30,64 @@ export default function Home() {
   };
   useEffect(() => {
     fetchMovies();
+    // Check if user is logged in
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
   }, []);
+
+  // Handle search
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredMovies(movies);
+    } else {
+      const filtered = movies.filter(
+        (movie) =>
+          movie.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (movie.summary &&
+            movie.summary.toLowerCase().includes(searchTerm.toLowerCase()))
+      );
+      setFilteredMovies(filtered);
+    }
+  }, [searchTerm, movies]);
 
   // Add a new movie
   const addMovie = async () => {
     router.push("/add-movie");
   };
 
-  // Delete a movie - Updated to port 5000
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    alert("Logged out successfully!");
+  };
+
+  // Delete a movie - Updated to port 5000 with authentication
   const deleteMovie = async (id) => {
     if (!confirm("Are you sure you want to delete this movie?")) return;
 
+    const token = localStorage.getItem("token");
     try {
-      await fetch(`http://localhost:5000/movies/${id}`, {
+      const response = await fetch(`http://localhost:5000/movies/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: token,
+        },
       });
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          alert("Please login to delete movies");
+          return;
+        }
+        throw new Error("Delete failed");
+      }
+
       setMovies((prev) => prev.filter((m) => m.id !== id));
+      alert("Movie deleted successfully!");
     } catch (error) {
       console.error("Error deleting movie:", error);
-      alert("Error deleting movie");
+      alert("Error deleting movie. Please try again.");
     }
   };
 
@@ -57,24 +99,87 @@ export default function Home() {
           Movie System
         </h1>
 
-        {/* Add Movie Button */}
-        <div>
-          <button onClick={addMovie}>Add New Movie</button>
+        {/* Search Bar - Available for all users */}
+        <div style={{ textAlign: "center", margin: "20px 0" }}>
+          <input
+            type="text"
+            placeholder="Search movies by name or description..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{
+              padding: "10px",
+              width: "300px",
+              borderRadius: "4px",
+              border: "1px solid #ccc",
+              fontSize: "16px",
+              marginRight: "10px",
+            }}
+          />
+          <button
+            onClick={() => setSearchTerm("")}
+            style={{
+              padding: "10px 15px",
+              backgroundColor: "#f0f0f0",
+              border: "1px solid #ccc",
+              borderRadius: "4px",
+              cursor: "pointer",
+            }}
+          >
+            Clear
+          </button>
         </div>
-        {/* Login Button */}
-        <div>
-          <button onClick={() => router.push("/login")}>Login</button>
+
+        {/* Auth Buttons - Different based on login status */}
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            justifyContent: "center",
+            marginBottom: "20px",
+          }}
+        >
+          {isLoggedIn ? (
+            <>
+              <button onClick={addMovie}>Add New Movie</button>
+              <button
+                onClick={handleLogout}
+                style={{ backgroundColor: "#dc3545", color: "white" }}
+              >
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <button onClick={() => router.push("/signup")}>Sign Up</button>
+              <button onClick={() => router.push("/login")}>Login</button>
+            </>
+          )}
+        </div>
+
+        {/* Status Message */}
+        <div style={{ textAlign: "center", marginBottom: "20px" }}>
+          {isLoggedIn ? (
+            <p style={{ color: "#28a745", fontWeight: "bold" }}>
+              Logged in! You can add or delete movies.
+            </p>
+          ) : (
+            <p style={{ color: "#6c757d" }}>Login to manage movies</p>
+          )}
         </div>
 
         {/* Movies List */}
         <div>
           {loading ? (
             <p>Loading movies...</p>
-          ) : movies.length === 0 ? (
-            <p>No movies found.</p>
+          ) : filteredMovies.length === 0 ? (
+            <p>
+              {searchTerm
+                ? `No movies found matching "${searchTerm}"`
+                : "No movies found."}
+            </p>
           ) : (
             <div className="movies-grid">
-              {movies.map((movie) => (
+              {filteredMovies.map((movie) => (
                 <div key={movie.id} className="movie-card">
                   {/* Movie Image */}
                   <div className="movie-image-container">
@@ -107,7 +212,6 @@ export default function Home() {
                         e.target.style.backgroundColor = "#f3f4f6";
                       }}
                       onLoad={(e) => {
-                        // Success - ensure proper styling
                         e.target.style.backgroundColor = "transparent";
                       }}
                     />
@@ -152,15 +256,17 @@ export default function Home() {
                       </div>
                     </div>
 
-                    {/* Delete Button */}
-                    <div className="movie-actions">
-                      <button
-                        onClick={() => deleteMovie(movie.id)}
-                        className="delete-btn"
-                      >
-                        Delete Movie
-                      </button>
-                    </div>
+                    {/* Delete Button - Only for logged-in users */}
+                    {isLoggedIn && (
+                      <div className="movie-actions">
+                        <button
+                          onClick={() => deleteMovie(movie.id)}
+                          className="delete-btn"
+                        >
+                          Delete Movie
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

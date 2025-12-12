@@ -5,7 +5,9 @@ create frontend page:
   Login page could use email and password fields.
   
 Phase 5
-  Merging all the pages
-  Test
+  Sign up page can create a user account to delete/ add movie.
+  Home page can see all the movie and search the movie by name.
+  Merging all the pages.
+  Test.
   
   
